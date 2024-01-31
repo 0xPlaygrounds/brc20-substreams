@@ -1,0 +1,17 @@
+specVersion: 0.0.6
+description: test substreams based subgraph
+repository: # fill in with git remote url
+schema:
+  file: ./schema.graphql
+
+dataSources:
+  - kind: substreams
+    name: test
+    network: bitcoin
+    source:
+      package:
+        moduleName: graph_out
+        file: brc20-v0.1.0.spkg
+    mapping:
+      kind: substreams/graph-entities
+      apiVersion: 0.0.5

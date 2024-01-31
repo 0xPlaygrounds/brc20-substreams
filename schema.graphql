@@ -1,0 +1,55 @@
+type Token @entity {
+    # ID is "{SYMBOL}"
+    id: ID!
+    symbol: String!
+    max_supply: BigInt!
+    mint_limit: BigInt
+    decimals: Int!
+
+    holders: [AccountBalance!]! @derivedFrom(field: "token")
+
+    deployment: Deploy!
+    mints: [Mint!]! @derivedFrom(field: "token")
+    transfers: [Transfer!]! @derivedFrom(field: "token")
+}
+
+type Account {
+    # ID is "{ACCOUNT}"
+    id: ID!
+    balances: [AccountBalance!]! @derivedFrom(field: "account")
+}
+
+type AccountBalance {
+    # ID is "{SYMBOL}:{ACCOUNT}"
+    id: ID!
+    token: Token!
+    account: Account!
+    balance: BigInt!
+}
+
+type Deploy @entity {
+    # ID is "{SYMBOL}:DEPLOY"
+    id: ID!
+    token: Token!
+    deployer: String!
+    timestamp: BigInt!
+    block: BigInt!
+}
+
+type Mint @entity {
+    # ID is "{SYMBOL}:MINT:{INDEX}"
+    id: ID!
+    token: Token!
+    to: String!
+    value: BigInt!
+}
+
+type Transfer @entity {
+    # ID is "{SYMBOL}:TRANSFER:{INDEX}"
+    id: ID!
+    token: Token!
+    from: String!
+    to: String!
+    value: BigInt!
+}
+

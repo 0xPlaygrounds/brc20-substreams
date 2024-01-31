@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package ordinals.v1;
+
+// Represents a continuous block of ordinals assigned to a given UTXO
+message OrdinalBlock {
+    string utxo = 1;
+    optional string address = 2;
+    uint64 start = 3;
+    uint64 size = 4;
+}
+
+message Transaction {
+    string txid = 1;
+    // Output number
+    uint64 idx = 2;
+    // Amount transferred in sats
+    uint64 amount = 3;
+    // Fee in sats
+    // int64 fee = 4;
+    // Ordinals assignment (only present for coinbase transaction)
+    repeated OrdinalBlock coinbase_ordinals = 4;
+    // Input UTXOs
+    repeated string input_utxos = 5;
+    // Note: The ordinals blocks here are relative and refer to the
+    // ordinals assigned to the input UTXOs
+    // E.g.: The Nth to Mth ordinals of the input utxos should
+    // be assigned to some output utxo
+    repeated OrdinalBlock relative_ordinals = 6;
+
+    repeated Inscription inscriptions = 7;
+}
+
+message Block {
+    // Block timestamp
+    uint64 timestamp = 1;
+    // Block number
+    uint64 number = 2;
+    // Total miner reward (in sats)
+    uint64 miner_reward = 3;
+    // Block subsidy (in sats)
+    uint64 subsidy = 4;
+    // Miner fees (in sats)
+    uint64 fees = 5;
+    // Block transactions
+    repeated Transaction txs = 6;
+}
+
+message Inscription {
+    string id = 1;
+    // Optional MIME type of the inscription
+    optional string content_type = 2;
+    // Optional pointer if the inscription is not for the 
+    // first ordinal of its inputs
+    optional int64 pointer = 3;
+    optional string parent = 4;
+    optional string metadata = 5;
+    optional string metaprotocol = 6;
+    optional string content_encoding = 7;
+    // Content of the inscription
+    string content = 8;
+    string content_length = 9;
+}
+
+message Inscriptions {
+    repeated Inscription inscriptions = 1;
+}

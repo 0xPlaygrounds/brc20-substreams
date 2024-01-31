@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+package btc.brc20.v1;
+
+message Deploy {
+    string id = 1;
+    string symbol = 2;
+    string max_supply = 3;
+    optional string mint_limit = 4;
+    string decimals = 5;
+}
+
+message Mint {
+    string id = 1;
+    string token = 2;
+    string to = 3;
+    string amount = 4;
+}
+
+// Used to keep track of pending transfers
+message InscribedTransfer {
+    string id = 1;
+    string token = 2;
+    string from = 3;
+    string amount = 4;
+    string utxo = 5;
+    uint64 offset = 6;
+    uint64 utxo_amount = 7;
+}
+
+// Used to keep track of pending transfers location in a UTXO
+message InscribedTransferLocation {
+    string id = 1;
+    uint64 offset = 2;
+    string from = 3;
+    string amount = 4;
+    uint64 utxo_amount = 5;
+}
+
+// Represents executed transfer
+message ExecutedTransfer {
+    string id = 1;
+    string from = 2;
+    string to = 3;
+    string amount = 4;
+}
+
+message Brc20Events {
+    uint64 block_height = 1;
+    uint64 timestamp = 2;
+    repeated Deploy deploys = 3;
+    repeated Mint mints = 4;
+    repeated InscribedTransfer inscribed_transfers = 5;
+    repeated ExecutedTransfer executed_transfers = 6;
+}
