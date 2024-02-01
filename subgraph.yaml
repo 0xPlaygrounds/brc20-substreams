@@ -1,12 +1,11 @@
 specVersion: 0.0.6
-description: test substreams based subgraph
-repository: # fill in with git remote url
+description: BRC20 events and balances subgraph
+repository: https://github.com/0xPlaygrounds/brc20-substreams
 schema:
   file: ./schema.graphql
-
 dataSources:
   - kind: substreams
-    name: test
+    name: brc20-substreams
     network: bitcoin
     source:
       package:

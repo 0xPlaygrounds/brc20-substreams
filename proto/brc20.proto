@@ -7,7 +7,8 @@ message Deploy {
     string symbol = 2;
     string max_supply = 3;
     optional string mint_limit = 4;
-    string decimals = 5;
+    int32 decimals = 5;
+    string deployer = 6;
 }
 
 message Mint {
@@ -31,18 +32,24 @@ message InscribedTransfer {
 // Used to keep track of pending transfers location in a UTXO
 message InscribedTransferLocation {
     string id = 1;
-    uint64 offset = 2;
+    string token = 2;
     string from = 3;
     string amount = 4;
-    uint64 utxo_amount = 5;
+
+    // Offset indicating which sat of the UTXO the transfer is inscribed on
+    uint64 offset = 5;
+
+    // Note: maybe remove this
+    uint64 utxo_amount = 6;
 }
 
 // Represents executed transfer
 message ExecutedTransfer {
     string id = 1;
-    string from = 2;
-    string to = 3;
-    string amount = 4;
+    string token = 2;
+    string from = 3;
+    string to = 4;
+    string amount = 5;
 }
 
 message Brc20Events {

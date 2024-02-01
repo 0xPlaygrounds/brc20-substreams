@@ -10,8 +10,10 @@ pub struct Deploy {
     pub max_supply: ::prost::alloc::string::String,
     #[prost(string, optional, tag="4")]
     pub mint_limit: ::core::option::Option<::prost::alloc::string::String>,
-    #[prost(string, tag="5")]
-    pub decimals: ::prost::alloc::string::String,
+    #[prost(int32, tag="5")]
+    pub decimals: i32,
+    #[prost(string, tag="6")]
+    pub deployer: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -50,13 +52,17 @@ pub struct InscribedTransfer {
 pub struct InscribedTransferLocation {
     #[prost(string, tag="1")]
     pub id: ::prost::alloc::string::String,
-    #[prost(uint64, tag="2")]
-    pub offset: u64,
+    #[prost(string, tag="2")]
+    pub token: ::prost::alloc::string::String,
     #[prost(string, tag="3")]
     pub from: ::prost::alloc::string::String,
     #[prost(string, tag="4")]
     pub amount: ::prost::alloc::string::String,
+    /// Offset indicating which sat of the UTXO the transfer is inscribed on
     #[prost(uint64, tag="5")]
+    pub offset: u64,
+    /// Note: maybe remove this
+    #[prost(uint64, tag="6")]
     pub utxo_amount: u64,
 }
 /// Represents executed transfer
@@ -66,10 +72,12 @@ pub struct ExecutedTransfer {
     #[prost(string, tag="1")]
     pub id: ::prost::alloc::string::String,
     #[prost(string, tag="2")]
-    pub from: ::prost::alloc::string::String,
+    pub token: ::prost::alloc::string::String,
     #[prost(string, tag="3")]
-    pub to: ::prost::alloc::string::String,
+    pub from: ::prost::alloc::string::String,
     #[prost(string, tag="4")]
+    pub to: ::prost::alloc::string::String,
+    #[prost(string, tag="5")]
     pub amount: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]

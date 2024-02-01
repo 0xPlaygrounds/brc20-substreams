@@ -13,25 +13,27 @@ type Token @entity {
     transfers: [Transfer!]! @derivedFrom(field: "token")
 }
 
-type Account {
+type Account @entity {
     # ID is "{ACCOUNT}"
     id: ID!
     balances: [AccountBalance!]! @derivedFrom(field: "account")
 }
 
-type AccountBalance {
+type AccountBalance @entity {
     # ID is "{SYMBOL}:{ACCOUNT}"
     id: ID!
     token: Token!
     account: Account!
     balance: BigInt!
+    transferable: BigInt!
 }
 
+# Events
 type Deploy @entity {
     # ID is "{SYMBOL}:DEPLOY"
     id: ID!
     token: Token!
-    deployer: String!
+    deployer: Account!
     timestamp: BigInt!
     block: BigInt!
 }
@@ -41,7 +43,15 @@ type Mint @entity {
     id: ID!
     token: Token!
     to: String!
-    value: BigInt!
+    amount: BigInt!
+}
+
+type InscribeTransfer @entity {
+    # ID is "{SYMBOL}:INSCRIBE_TRANSFER:{INDEX}"
+    id: ID!
+    token: Token!
+    to: String!
+    amount: BigInt!
 }
 
 type Transfer @entity {
@@ -50,6 +60,6 @@ type Transfer @entity {
     token: Token!
     from: String!
     to: String!
-    value: BigInt!
+    amount: BigInt!
 }
 

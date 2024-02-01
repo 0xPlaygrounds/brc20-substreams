@@ -5,9 +5,7 @@ package:
 
 imports:
   bitcoin: https://github.com/streamingfast/firehose-bitcoin/releases/download/v1.0.0-rc.1/bitcoin-v1.0.0.spkg
-  sql: https://github.com/streamingfast/substreams-sink-sql/releases/download/protodefs-v1.0.7/substreams-sink-sql-protodefs-v1.0.7.spkg
   graph: https://github.com/streamingfast/substreams-sink-subgraph/releases/download/v0.1.0/substreams-sink-subgraph-protodefs-v0.1.0.spkg
-  database_change: https://github.com/streamingfast/substreams-sink-database-changes/releases/download/v1.2.1/substreams-database-change-v1.2.1.spkg
   entity: https://github.com/streamingfast/substreams-entity-change/releases/download/v1.1.0/substreams-entity-change-v1.1.0.spkg
 
 protobuf:
@@ -57,21 +55,33 @@ modules:
     output:
       type: proto:btc.brc20.v1.Brc20Events
 
-  # - name: db_out
-  #   kind: map
-  #   initialBlock: 0
-  #   inputs:
-  #     - map: map_events
-  #   output:
-  #     type: proto:sf.substreams.sink.database.v1.DatabaseChanges
+  - name: store_balances
+    kind: store
+    initialBlock: 779830
+    updatePolicy: add
+    valueType: bigint
+    inputs:
+      - map: map_resolve_transfers
 
-  # - name: graph_out
-  #   kind: map
-  #   initialBlock: 0
-  #   inputs:
-  #     - map: map_events
-  #   output:
-  #     type: proto:sf.substreams.entity.v1.EntityChanges
+  - name: store_transferable_balances
+    kind: store
+    initialBlock: 779830
+    updatePolicy: add
+    valueType: bigint
+    inputs:
+      - map: map_resolve_transfers
+
+  - name: graph_out
+    kind: map
+    initialBlock: 779830
+    inputs:
+      - map: map_resolve_transfers
+      - store: store_balances
+        mode: deltas
+      - store: store_transferable_balances
+        mode: deltas
+    output:
+      type: proto:sf.substreams.entity.v1.EntityChanges
 
 # network: bitcoin
 # sink:

@@ -30,6 +30,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
+name = "base64"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
+
+[[package]]
 name = "bech32"
 version = "0.10.0-beta"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -123,6 +129,7 @@ dependencies = [
  "serde_json",
  "substreams",
  "substreams-database-change",
+ "substreams-entity-change",
  "substreams-ethereum",
 ]
 
@@ -856,6 +863,18 @@ version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ffb197c21f6b37e87fc275b29c5e330812008b995144f85d0afad36cafc846f1"
 dependencies = [
+ "prost",
+ "prost-types",
+ "substreams",
+]
+
+[[package]]
+name = "substreams-entity-change"
+version = "1.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e07421917bd53518cb65b03e03671ecda0653995c71e5a2be815c3c755ea23c0"
+dependencies = [
+ "base64",
  "prost",
  "prost-types",
  "substreams",

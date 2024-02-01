@@ -1,27 +1,69 @@
-use ethabi::ethereum_types::U256;
-use serde::Deserialize;
+use std::str::FromStr;
+
+use serde::{Deserialize, Deserializer};
+use serde_json::Value;
+use substreams::scalar::BigInt;
+
+// #[derive(Debug)]
+// struct _BigInt(BigInt);
+
+// impl<'de> Deserialize<'de> for _BigInt {
+//     fn deserialize<D>(deserializer: D) -> Result<_BigInt, D::Error>
+//     where
+//         D: Deserializer<'de>,
+//     {
+//         let s = String::deserialize(deserializer)?;
+//         BigInt::from_str(&s)
+//             .map(_BigInt)
+//             .map_err(serde::de::Error::custom)
+//     }
+// }
+
+fn deserialize_bigint<'de, D>(deserializer: D) -> Result<BigInt, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value = Value::deserialize(deserializer)?;
+    match value {
+        Value::String(s) => BigInt::from_str(&s).map_err(serde::de::Error::custom),
+        Value::Number(n) => Ok(BigInt::from(n.as_i64().ok_or(serde::de::Error::custom("Invalid number"))?)),
+        _ => Err(serde::de::Error::custom("Invalid type")),
+    }
+}
+
+fn deserialize_bigint_option<'de, D>(deserializer: D) -> Result<Option<BigInt>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let value = Value::deserialize(deserializer)?;
+    match value {
+        Value::String(s) => BigInt::from_str(&s).map(Some).map_err(serde::de::Error::custom),
+        Value::Number(n) => Ok(Some(BigInt::from(n.as_i64().ok_or(serde::de::Error::custom("Invalid number"))?))),
+        Value::Null => Ok(None),
+        _ => Err(serde::de::Error::custom("Invalid type")),
+    }
+}
 
 #[derive(Debug, Deserialize)]
 pub struct Deploy {
     pub tick: String,
-    pub max: U256,
-    pub lim: Option<U256>,
-    pub dec: Option<u8>,
+    #[serde(deserialize_with = "deserialize_bigint")]
+    pub max: BigInt,
+    #[serde(deserialize_with = "deserialize_bigint_option")]
+    pub lim: Option<BigInt>,
+    pub dec: Option<i32>,
 }
 
 impl Deploy {
-    pub fn max(&self) -> U256 {
-        // self.max.parse().unwrap()
-        self.max
-    }
+    // pub fn max(&self) -> BigInt {
+    //     self.max
+    // }
 
-    pub fn lim(&self) -> Option<U256> {
-        // self.lim.as_ref().map(|lim| lim.parse().unwrap())
-        self.lim
-    }
+    // pub fn lim(&self) -> Option<BigInt> {
+    //     self.lim
+    // }
 
-    pub fn dec(&self) -> u8 {
-        // self.dec.as_ref().unwrap_or(&"18".into()).parse().unwrap()
+    pub fn dec(&self) -> i32 {
         self.dec.unwrap_or(18)
     }
 }
@@ -29,28 +71,28 @@ impl Deploy {
 #[derive(Debug, Deserialize)]
 pub struct Mint {
     pub tick: String,
-    pub amt: U256,
+    #[serde(deserialize_with = "deserialize_bigint")]
+    pub amt: BigInt,
 }
 
-impl Mint {
-    pub fn amt(&self) -> U256 {
-        // self.amt.parse().unwrap()
-        self.amt
-    }
-}
+// impl Mint {
+//     pub fn amt(&self) -> BigInt {
+//         self.amt
+//     }
+// }
 
 #[derive(Debug, Deserialize)]
 pub struct Transfer {
     pub tick: String,
-    pub amt: U256,
+    #[serde(deserialize_with = "deserialize_bigint")]
+    pub amt: BigInt,
 }
 
-impl Transfer {
-    pub fn amt(&self) -> U256 {
-        // self.amt.parse().unwrap()
-        self.amt
-    }
-}
+// impl Transfer {
+//     pub fn amt(&self) -> BigInt {
+//         self.amt
+//     }
+// }
 
 #[derive(Debug, Deserialize)]
 #[serde(tag = "op", rename_all = "lowercase")]
