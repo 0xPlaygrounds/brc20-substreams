@@ -16,12 +16,11 @@ use pb::sf::bitcoin::r#type::v1 as btc;
 use substreams::pb::substreams::store_delta::Operation;
 use substreams::scalar::BigInt;
 use substreams::store::{
-    DeltaBigInt, Deltas, StoreAdd, StoreAddBigInt, StoreGet, StoreGetBigInt, StoreGetProto,
-    StoreNew, StoreSet, StoreSetProto,
+    DeltaBigInt, Deltas, StoreAdd, StoreAddBigInt, StoreGet, StoreGetProto, StoreNew, StoreSet,
+    StoreSetProto,
 };
 use substreams_entity_change::pb::entity::EntityChanges;
 use substreams_entity_change::tables::Tables;
-use tables_utils::SetOptional;
 
 struct Location {
     pub utxo: String,

@@ -56,31 +56,6 @@ pub fn parse_inscriptions(tx: &btc::Transaction) -> Result<Vec<Inscription>> {
     let raw_trx = Vec::from_hex(&tx.hex).unwrap();
     let tx_: Transaction = deserialize(&raw_trx).unwrap();
     let envelopes = ParsedEnvelope::from_transaction(&tx_);
-    // let inscriptions = envelopes.into_iter()
-    //     .enumerate()
-    //     .filter_map(move |(idx, envelope)| {
-    //         Some(Inscription {
-    //             id: format!("{}i{}", tx.txid, idx),
-    //             content_type: envelope.payload.content_type().map(|s| s.to_string()),
-    //             content_length: envelope.payload.content_length().map(|s| s.to_string()).unwrap_or("0".into()),
-    //             pointer: envelope.payload.pointer().map(|ptr| ptr as i64),
-    //             parent: envelope.payload.parent().map(|parent| parent.to_string()),
-    //             metadata: envelope.payload.metadata.clone().map(|metadata| match String::from_utf8(metadata.clone()) {
-    //                 Ok(metadata) => metadata,
-    //                 Err(_) => hex::encode(metadata)
-    //             }),
-    //             metaprotocol: envelope.payload.metaprotocol().map(|s| s.to_string()),
-    //             content_encoding: envelope.payload.content_encoding().map(|s| match String::from_utf8(s.as_ref().to_vec()) {
-    //                 Ok(content_type) => content_type,
-    //                 Err(_) => hex::encode(s.as_ref())
-    //             }),
-    //             content: match String::from_utf8(envelope.payload.body().unwrap_or_default().to_vec()) {
-    //                 Ok(content) => content,
-    //                 Err(_) => hex::encode(envelope.payload.body().unwrap_or_default())
-    //             }
-    //         })
-    //     })
-    //     .collect();
 
     Ok(envelopes
         .into_iter()
