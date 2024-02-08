@@ -310,10 +310,10 @@ fn graph_out(
                     (
                         parts
                             .next()
-                            .expect("Balance store key should be `{TOKEN}:{ACCOUNT}`"),
+                            .expect("Balance store key should be `{SYMBOL}:{ACCOUNT}`"),
                         parts
                             .next()
-                            .expect("Balance store key should be `{TOKEN}:{ACCOUNT}`"),
+                            .expect("Balance store key should be `{SYMBOL}:{ACCOUNT}`"),
                     )
                 };
 

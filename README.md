@@ -1,5 +1,5 @@
 # BRC-20 Substreams
-Substream for the BRC-20 protocol that tracks BRC-20 tokens, operations and account balances.
+Substream for the BRC-20 [protocol](https://layer1.gitbook.io/layer1-foundation/protocols/brc-20) that tracks BRC-20 tokens, operations and account balances.
 
 ## Background
 BRC-20 is a protocol that leverages Bitcoin Ordinals and Inscriptions to bring ERC-20 like tokens to the Bitcoin blockchain. The protocol uses inscriptions to record token operations (e.g.: minting and transfers) onchain. Each operation is represented by a JSON inscription.
@@ -13,7 +13,7 @@ The BRC-20 protocol defines three operations:
 
 Unlike the `deploy` and `mint` operations which only require a single Bitcoin transaction to execute, the `transfer` operation is actually performed in two steps. First, the token holder who wants to perform the transfer inscribes a `transfer` operation on a sat which they own. Then, to complete the transfer, the token holder must send the inscribed sat to the address to which they which to transfer the BRC-20 tokens.
 
-More information about each operation, including the required fields for each operation can be found [here](https://domo-2.gitbook.io/brc-20-experiment/#operations).
+More information about each operation, including the required fields for each operation can be found [here](https://layer1.gitbook.io/layer1-foundation/protocols/brc-20/documentation#operations).
 
 ## Implementation
 ```mermaid
@@ -44,7 +44,9 @@ The substream roughly follows the following procedure to extract and interpret B
 ### Limitations
 Since the substream is not keeping track of ordinals nor the amount of sats held by each UTXO, this creates certain limitations. For instance, it is not possible to know the exact ordinal that has been inscribed with a BRC-20 operation. Moreover, in the case of transfer execution (i.e.: transfering the sat that has been inscribed with a `transfer` inscription), only transfers for which the inscribed sat is located in the first input UTXO of a transaction can be reliably handled.
 
-A lot of BRC-20 "rules" are not enforced by the substreams (e.g.: transfer of tokens that the account does not own). Moreover, there is some ambiguity in the BRC-20 protocol which the substreams handles naively such as the deployment of multiple tokens with the same symbol (the symbol is naively used as the primary key, and the substreams considers both tokens to be the "same"). Trying to handle these cases would lead to ambiguity since, for instance, `mint` and `transfer` operations use the token symbol as the token identifier, which makes it essentially impossible to know *which* token is being referred to in the case where multiple tokens with the same symbol exist.
+For this first MVP, a lot of BRC-20 "rules" are not enforced by the substreams (e.g.: transfer of tokens that the account does not own). Moreover, there is some ambiguity in the BRC-20 protocol which the substreams handles naively such as the deployment of multiple tokens with the same symbol (the symbol is naively used as the primary key, and the substreams considers both tokens to be the "same"). Trying to handle these cases would lead to ambiguity since, for instance, `mint` and `transfer` operations use the token symbol as the token identifier, which makes it essentially impossible to know *which* token is being referred to in the case where multiple tokens with the same symbol exist.
+
+The list of indexing rules can be found [here](https://layer1.gitbook.io/layer1-foundation/protocols/brc-20/indexing).
 
 ## License
 [Apache 2.0](LICENSE)
