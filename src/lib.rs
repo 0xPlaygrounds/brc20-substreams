@@ -104,7 +104,7 @@ fn map_brc20_events(block: btc::Block) -> Result<Brc20Events, substreams::errors
             .filter_map(|(_, address, event)| match (address, event) {
                 (Some(address), Brc20Event::Deploy(deploy)) => Some(Deploy {
                     id: "".into(),
-                    symbol: deploy.tick.clone(),
+                    symbol: deploy.tick(),
                     max_supply: deploy.max.to_string(),
                     mint_limit: deploy.lim().to_string(),
                     decimals: deploy.dec(),
@@ -118,7 +118,7 @@ fn map_brc20_events(block: btc::Block) -> Result<Brc20Events, substreams::errors
             .filter_map(|(_, address, event)| match (address, event) {
                 (Some(address), Brc20Event::Mint(mint)) => Some(Mint {
                     id: "".into(),
-                    token: mint.tick.clone(),
+                    token: mint.tick(),
                     to: address.into(),
                     amount: mint.amt.to_string(),
                 }),
@@ -130,7 +130,7 @@ fn map_brc20_events(block: btc::Block) -> Result<Brc20Events, substreams::errors
             .filter_map(|(location, address, event)| match (address, event) {
                 (Some(address), Brc20Event::Transfer(transfer)) => Some(InscribedTransfer {
                     id: "".into(),
-                    token: transfer.tick.clone(),
+                    token: transfer.tick(),
                     // to: "".into(),
                     from: address.into(),
                     amount: transfer.amt.to_string(),

@@ -32,12 +32,12 @@ where
 #[derive(Debug, Deserialize)]
 pub struct Deploy {
     pub p: String,
-    pub tick: String,
+    tick: String,
     #[serde(deserialize_with = "deserialize_bigint")]
     pub max: BigInt,
     #[serde(deserialize_with = "deserialize_bigint_option")]
-    pub lim: Option<BigInt>,
-    pub dec: Option<i32>,
+    lim: Option<BigInt>,
+    dec: Option<i32>,
 }
 
 impl Deploy {
@@ -49,12 +49,11 @@ impl Deploy {
         self.lim.as_ref().unwrap_or(&self.max).clone()
     }
 
-    pub fn valid(&self) -> bool {
-        // Check protocol
-        if self.p != "brc-20" {
-            return false;
-        }
+    pub fn tick(&self) -> String {
+        self.tick.to_lowercase()
+    }
 
+    pub fn valid(&self) -> bool {
         // Check zero values
         if self.max.is_zero() || self.lim().is_zero() {
             return false;
@@ -72,18 +71,17 @@ impl Deploy {
 #[derive(Debug, Deserialize)]
 pub struct Mint {
     pub p: String,
-    pub tick: String,
+    tick: String,
     #[serde(deserialize_with = "deserialize_bigint")]
     pub amt: BigInt,
 }
 
 impl Mint {
-    pub fn valid(&self) -> bool {
-        // Check protocol
-        if self.p != "brc-20" {
-            return false;
-        }
+    pub fn tick(&self) -> String {
+        self.tick.to_lowercase()
+    }
 
+    pub fn valid(&self) -> bool {
         // Check zero values
         if self.amt.is_zero() {
             return false;
@@ -96,18 +94,17 @@ impl Mint {
 #[derive(Debug, Deserialize)]
 pub struct Transfer {
     pub p: String,
-    pub tick: String,
+    tick: String,
     #[serde(deserialize_with = "deserialize_bigint")]
     pub amt: BigInt,
 }
 
 impl Transfer {
-    pub fn valid(&self) -> bool {
-        // Check protocol
-        if self.p != "brc-20" {
-            return false;
-        }
+    pub fn tick(&self) -> String {
+        self.tick.to_lowercase()
+    }
 
+    pub fn valid(&self) -> bool {
         // Check zero values
         if self.amt.is_zero() {
             return false;
@@ -134,15 +131,25 @@ impl Brc20Event {
         }
     }
 
-    pub fn tick(&self) -> &str {
+    pub fn tick(&self) -> String {
         match self {
-            Brc20Event::Deploy(d) => &d.tick,
-            Brc20Event::Mint(m) => &m.tick,
-            Brc20Event::Transfer(t) => &t.tick,
+            Brc20Event::Deploy(d) => d.tick(),
+            Brc20Event::Mint(m) => m.tick(),
+            Brc20Event::Transfer(t) => t.tick(),
         }
     }
 
     pub fn valid(&self) -> bool {
+        // Check protocol
+        if self.p() != "brc-20" {
+            return false;
+        }
+
+        // Check ticker
+        if self.tick().len() != 4 {
+            return false;
+        }
+
         match self {
             Brc20Event::Deploy(d) => d.valid(),
             Brc20Event::Mint(m) => m.valid(),
