@@ -80,7 +80,7 @@ fn map_brc20_events(block: btc::Block) -> Result<Brc20Events, substreams::errors
             };
 
             match serde_json::from_str::<Brc20Event>(&content) {
-                Ok(event) if event.p() == "brc-20" => Some((location, address, event)),
+                Ok(event) if event.valid() => Some((location, address, event)),
                 Ok(_) => None,
                 Err(err) => {
                     substreams::log::info!(

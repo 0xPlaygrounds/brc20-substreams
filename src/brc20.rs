@@ -48,6 +48,25 @@ impl Deploy {
     pub fn lim(&self) -> BigInt {
         self.lim.as_ref().unwrap_or(&self.max).clone()
     }
+
+    pub fn valid(&self) -> bool {
+        // Check protocol
+        if self.p != "brc-20" {
+            return false;
+        }
+
+        // Check zero values
+        if self.max.is_zero() || self.lim().is_zero() {
+            return false;
+        }
+
+        // Check dec value
+        if self.dec() > 18 || self.dec() < 0 {
+            return false;
+        }
+
+        true
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -58,12 +77,44 @@ pub struct Mint {
     pub amt: BigInt,
 }
 
+impl Mint {
+    pub fn valid(&self) -> bool {
+        // Check protocol
+        if self.p != "brc-20" {
+            return false;
+        }
+
+        // Check zero values
+        if self.amt.is_zero() {
+            return false;
+        }
+
+        true
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct Transfer {
     pub p: String,
     pub tick: String,
     #[serde(deserialize_with = "deserialize_bigint")]
     pub amt: BigInt,
+}
+
+impl Transfer {
+    pub fn valid(&self) -> bool {
+        // Check protocol
+        if self.p != "brc-20" {
+            return false;
+        }
+
+        // Check zero values
+        if self.amt.is_zero() {
+            return false;
+        }
+
+        true
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -88,6 +139,14 @@ impl Brc20Event {
             Brc20Event::Deploy(d) => &d.tick,
             Brc20Event::Mint(m) => &m.tick,
             Brc20Event::Transfer(t) => &t.tick,
+        }
+    }
+
+    pub fn valid(&self) -> bool {
+        match self {
+            Brc20Event::Deploy(d) => d.valid(),
+            Brc20Event::Mint(m) => m.valid(),
+            Brc20Event::Transfer(t) => t.valid(),
         }
     }
 }
