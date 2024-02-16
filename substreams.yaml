@@ -11,7 +11,6 @@ imports:
 protobuf:
   files:
     - brc20.proto
-    - ordinals.proto
   importPaths:
     - ./proto
 
@@ -41,7 +40,15 @@ modules:
     kind: store
     initialBlock: 779830
     updatePolicy: set
-    valueType: proto:btc.brc20.v1.InscribeTransferStore
+    valueType: proto:btc.brc20.v1.InscribedTransferLocation
+    inputs:
+      - map: map_brc20_events
+
+  - name: store_tokens
+    kind: store
+    initialBlock: 779830
+    updatePolicy: set
+    valueType: proto:btc.brc20.v1.Token
     inputs:
       - map: map_brc20_events
 
@@ -52,6 +59,7 @@ modules:
       - source: sf.bitcoin.type.v1.Block
       - map: map_brc20_events
       - store: store_inscribed_transfers
+      - store: store_tokens
     output:
       type: proto:btc.brc20.v1.Brc20Events
 
@@ -75,6 +83,7 @@ modules:
     kind: map
     initialBlock: 779830
     inputs:
+      - source: sf.substreams.v1.Clock
       - map: map_resolve_transfers
       - store: store_balances
         mode: deltas

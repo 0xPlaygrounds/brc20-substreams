@@ -6,7 +6,7 @@ message Deploy {
     string id = 1;
     string symbol = 2;
     string max_supply = 3;
-    optional string mint_limit = 4;
+    string mint_limit = 4;
     int32 decimals = 5;
     string deployer = 6;
 }
@@ -29,6 +29,26 @@ message InscribedTransfer {
     uint64 utxo_amount = 7;
 }
 
+// Represents executed transfer
+message ExecutedTransfer {
+    string id = 1;
+    string token = 2;
+    string from = 3;
+    string to = 4;
+    string amount = 5;
+}
+
+message Brc20Events {
+    repeated Deploy deploys = 1;
+    repeated Mint mints = 2;
+    repeated InscribedTransfer inscribed_transfers = 3;
+    repeated ExecutedTransfer executed_transfers = 4;
+}
+
+// ================================================================
+// Internal messages (e.g.: used in store modules)
+// ================================================================
+
 // Used to keep track of pending transfers location in a UTXO
 message InscribedTransferLocation {
     string id = 1;
@@ -43,20 +63,11 @@ message InscribedTransferLocation {
     uint64 utxo_amount = 6;
 }
 
-// Represents executed transfer
-message ExecutedTransfer {
+message Token {
     string id = 1;
-    string token = 2;
-    string from = 3;
-    string to = 4;
-    string amount = 5;
-}
-
-message Brc20Events {
-    uint64 block_height = 1;
-    uint64 timestamp = 2;
-    repeated Deploy deploys = 3;
-    repeated Mint mints = 4;
-    repeated InscribedTransfer inscribed_transfers = 5;
-    repeated ExecutedTransfer executed_transfers = 6;
+    string symbol = 2;
+    string max_supply = 3;
+    string mint_limit = 4;
+    int32 decimals = 5;
+    string deployer = 6;
 }
