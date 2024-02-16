@@ -10,7 +10,7 @@ use anyhow::Result;
 use brc20::Brc20Event;
 use btc_utils::{btc_to_sats, parse_inscriptions};
 use pb::btc::brc20::v1::{
-    Brc20Events, Deploy, ExecutedTransfer, InscribedTransfer, InscribedTransferLocation, Mint,
+    Brc20Events, Deploy, ExecutedTransfer, InscribedTransfer, InscribedTransferLocation, Mint, Token,
 };
 use pb::sf::bitcoin::r#type::v1 as btc;
 use substreams::pb::substreams::store_delta::Operation;
@@ -164,6 +164,25 @@ fn store_inscribed_transfers(events: Brc20Events, store: StoreSetProto<Inscribed
 }
 
 #[substreams::handlers::store]
+fn store_tokens(events: Brc20Events, store: StoreSetProto<Token>) {
+    events.deploys.iter().for_each(|deploy| {
+        store.set(
+            0,
+            deploy.symbol.clone(),
+            &Token {
+                id: deploy.id.clone(),
+                symbol: deploy.symbol.clone(),
+                max_supply: deploy.max_supply.clone(),
+                mint_limit: deploy.mint_limit.clone(),
+                decimals: deploy.decimals.clone(),
+                deployer: deploy.deployer.clone(),
+            },
+        );
+    });
+}
+
+
+#[substreams::handlers::store]
 fn store_balances(events: Brc20Events, store: StoreAddBigInt) {
     // On mints, we add the amount to the receiver's balance
     events.mints.iter().for_each(|mint| {
@@ -224,7 +243,8 @@ fn store_transferable_balances(events: Brc20Events, store: StoreAddBigInt) {
 fn map_resolve_transfers(
     block: btc::Block,
     events: Brc20Events,
-    store: StoreGetProto<InscribedTransferLocation>,
+    transfer_store: StoreGetProto<InscribedTransferLocation>,
+    token_store: StoreGetProto<Token>,
 ) -> Result<Brc20Events, substreams::errors::Error> {
     let executed_transfers = block
         .tx
@@ -233,7 +253,7 @@ fn map_resolve_transfers(
             // Note: Without tracking UTXO values, we can only reliably resolve transfers where the
             // inscribed sat is held by the first input UTXO of the transaction
             if let Some(inscribed_transfer_loc) =
-                store.get_at(0, format!("{}:{}", tx.vin[0].txid, tx.vin[0].vout))
+                transfer_store.get_at(0, format!("{}:{}", tx.vin[0].txid, tx.vin[0].vout))
             {
                 let (vout, _) = tx.nth_sat_utxo(inscribed_transfer_loc.offset)?;
                 Some(ExecutedTransfer {
@@ -248,7 +268,7 @@ fn map_resolve_transfers(
                 if let Some(inscribed_transfer_loc) = tx
                     .vin
                     .iter()
-                    .find_map(|vin| store.get_at(0, format!("{}:{}", vin.txid, vin.vout)))
+                    .find_map(|vin| transfer_store.get_at(0, format!("{}:{}", vin.txid, vin.vout)))
                 {
                     substreams::log::info!(
                         "Could not resolve inscribed transfer {}",
@@ -262,6 +282,12 @@ fn map_resolve_transfers(
 
     Ok(Brc20Events {
         executed_transfers,
+        mints: events.mints.into_iter()
+            .filter(|mint| match token_store.get_at(0, mint.token.clone()) {
+                Some(token) => BigInt::from_str(&mint.amount).unwrap() < BigInt::from_str(&token.mint_limit).unwrap(),
+                None => false,
+            })
+            .collect(),
         ..events
     })
 }
