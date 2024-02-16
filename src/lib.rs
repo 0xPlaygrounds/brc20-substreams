@@ -43,6 +43,14 @@ fn map_brc20_events(block: btc::Block) -> Result<Brc20Events, substreams::errors
             match parse_inscriptions(&tx) {
                 Ok(inscriptions) => inscriptions
                     .into_iter()
+                    .filter(|inscription| match 
+                        inscription.content_type()
+                            .map(|ctype| ctype.split(";"))
+                            .and_then(|mut parts| parts.next())
+                    {
+                        Some(content_type) => content_type == "text/plain" || content_type == "application/json",
+                        None => false,
+                    })
                     .filter_map(|inscription| {
                         let (vout, offset) = tx.nth_sat_utxo(inscription.pointer().unwrap_or(0))?;
                         Some((
@@ -72,7 +80,8 @@ fn map_brc20_events(block: btc::Block) -> Result<Brc20Events, substreams::errors
             };
 
             match serde_json::from_str::<Brc20Event>(&content) {
-                Ok(event) => Some((location, address, event)),
+                Ok(event) if event.p() == "brc-20" => Some((location, address, event)),
+                Ok(_) => None,
                 Err(err) => {
                     substreams::log::info!(
                         "Error parsing inscription content {}: {}",

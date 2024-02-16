@@ -39,6 +39,7 @@ where
 
 #[derive(Debug, Deserialize)]
 pub struct Deploy {
+    pub p: String,
     pub tick: String,
     #[serde(deserialize_with = "deserialize_bigint")]
     pub max: BigInt,
@@ -55,6 +56,7 @@ impl Deploy {
 
 #[derive(Debug, Deserialize)]
 pub struct Mint {
+    pub p: String,
     pub tick: String,
     #[serde(deserialize_with = "deserialize_bigint")]
     pub amt: BigInt,
@@ -62,6 +64,7 @@ pub struct Mint {
 
 #[derive(Debug, Deserialize)]
 pub struct Transfer {
+    pub p: String,
     pub tick: String,
     #[serde(deserialize_with = "deserialize_bigint")]
     pub amt: BigInt,
@@ -73,4 +76,22 @@ pub enum Brc20Event {
     Deploy(Deploy),
     Mint(Mint),
     Transfer(Transfer),
+}
+
+impl Brc20Event {
+    pub fn p(&self) -> &str {
+        match self {
+            Brc20Event::Deploy(d) => &d.p,
+            Brc20Event::Mint(m) => &m.p,
+            Brc20Event::Transfer(t) => &t.p,
+        }
+    }
+
+    pub fn tick(&self) -> &str {
+        match self {
+            Brc20Event::Deploy(d) => &d.tick,
+            Brc20Event::Mint(m) => &m.tick,
+            Brc20Event::Transfer(t) => &t.tick,
+        }
+    }
 }
