@@ -14,6 +14,7 @@ use pb::btc::brc20::v1::{
 };
 use pb::sf::bitcoin::r#type::v1 as btc;
 use substreams::pb::substreams::store_delta::Operation;
+use substreams::pb::substreams::Clock;
 use substreams::scalar::BigInt;
 use substreams::store::{
     DeltaBigInt, Deltas, StoreAdd, StoreAddBigInt, StoreGet, StoreGetProto, StoreNew, StoreSet,
@@ -95,10 +96,6 @@ fn map_brc20_events(block: btc::Block) -> Result<Brc20Events, substreams::errors
         .collect::<Vec<_>>();
 
     Ok(Brc20Events {
-        // block_height: block.height as u64,
-        // timestamp: block.time as u64,
-        block_height: 0,
-        timestamp: 0,
         deploys: events
             .iter()
             .filter_map(|(_, address, event)| match (address, event) {
@@ -294,6 +291,7 @@ fn map_resolve_transfers(
 
 #[substreams::handlers::map]
 fn graph_out(
+    clock: Clock,
     events: Brc20Events,
     balances_store: Deltas<DeltaBigInt>,
     transferable_balances_store: Deltas<DeltaBigInt>,
@@ -305,8 +303,11 @@ fn graph_out(
             .create_row("Deploy", deploy.id.clone())
             .set("token", deploy.symbol.clone())
             .set("deployer", deploy.deployer.clone())
-            .set("timestamp", events.block_height.clone())
-            .set("block", events.timestamp.clone());
+            .set("timestamp", clock.number.clone())
+            .set("block", clock.timestamp.as_ref()
+                .map(|t| t.seconds)
+                .unwrap_or_default()
+            );
 
         tables
             .create_row("Token", deploy.symbol.clone())
