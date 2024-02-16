@@ -64,17 +64,13 @@ pub struct ExecutedTransfer {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Brc20Events {
-    #[prost(uint64, tag="1")]
-    pub block_height: u64,
-    #[prost(uint64, tag="2")]
-    pub timestamp: u64,
-    #[prost(message, repeated, tag="3")]
+    #[prost(message, repeated, tag="1")]
     pub deploys: ::prost::alloc::vec::Vec<Deploy>,
-    #[prost(message, repeated, tag="4")]
+    #[prost(message, repeated, tag="2")]
     pub mints: ::prost::alloc::vec::Vec<Mint>,
-    #[prost(message, repeated, tag="5")]
+    #[prost(message, repeated, tag="3")]
     pub inscribed_transfers: ::prost::alloc::vec::Vec<InscribedTransfer>,
-    #[prost(message, repeated, tag="6")]
+    #[prost(message, repeated, tag="4")]
     pub executed_transfers: ::prost::alloc::vec::Vec<ExecutedTransfer>,
 }
 // ================================================================
