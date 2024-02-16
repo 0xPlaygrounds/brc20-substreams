@@ -11,10 +11,6 @@ where
     let value = Value::deserialize(deserializer)?;
     match value {
         Value::String(s) => BigInt::from_str(&s).map_err(serde::de::Error::custom),
-        Value::Number(n) => Ok(BigInt::from(
-            n.as_i64()
-                .ok_or(serde::de::Error::custom("Invalid number"))?,
-        )),
         _ => Err(serde::de::Error::custom("Invalid type")),
     }
 }
@@ -28,10 +24,6 @@ where
         Value::String(s) => BigInt::from_str(&s)
             .map(Some)
             .map_err(serde::de::Error::custom),
-        Value::Number(n) => Ok(Some(BigInt::from(
-            n.as_i64()
-                .ok_or(serde::de::Error::custom("Invalid number"))?,
-        ))),
         Value::Null => Ok(None),
         _ => Err(serde::de::Error::custom("Invalid type")),
     }
@@ -51,6 +43,10 @@ pub struct Deploy {
 impl Deploy {
     pub fn dec(&self) -> i32 {
         self.dec.unwrap_or(18)
+    }
+
+    pub fn lim(&self) -> BigInt {
+        self.lim.as_ref().unwrap_or(&self.max).clone()
     }
 }
 

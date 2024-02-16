@@ -8,8 +8,8 @@ pub struct Deploy {
     pub symbol: ::prost::alloc::string::String,
     #[prost(string, tag="3")]
     pub max_supply: ::prost::alloc::string::String,
-    #[prost(string, optional, tag="4")]
-    pub mint_limit: ::core::option::Option<::prost::alloc::string::String>,
+    #[prost(string, tag="4")]
+    pub mint_limit: ::prost::alloc::string::String,
     #[prost(int32, tag="5")]
     pub decimals: i32,
     #[prost(string, tag="6")]

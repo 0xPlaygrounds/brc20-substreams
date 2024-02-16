@@ -3,7 +3,7 @@ type Token @entity {
     id: ID!
     symbol: String!
     max_supply: BigInt!
-    mint_limit: BigInt
+    mint_limit: BigInt!
     decimals: Int!
 
     holders: [AccountBalance!]! @derivedFrom(field: "token")

@@ -6,7 +6,7 @@ message Deploy {
     string id = 1;
     string symbol = 2;
     string max_supply = 3;
-    optional string mint_limit = 4;
+    string mint_limit = 4;
     int32 decimals = 5;
     string deployer = 6;
 }

@@ -106,7 +106,7 @@ fn map_brc20_events(block: btc::Block) -> Result<Brc20Events, substreams::errors
                     id: "".into(),
                     symbol: deploy.tick.clone(),
                     max_supply: deploy.max.to_string(),
-                    mint_limit: deploy.lim.as_ref().map(|lim| lim.to_string()),
+                    mint_limit: deploy.lim().to_string(),
                     decimals: deploy.dec(),
                     deployer: address.clone(),
                 }),
@@ -286,7 +286,7 @@ fn graph_out(
             .create_row("Token", deploy.symbol.clone())
             .set("symbol", deploy.symbol.clone())
             .set_bigint("max_supply", &deploy.max_supply)
-            .set_bigint_or_zero("mint_limit", &deploy.mint_limit().into())
+            .set_bigint("mint_limit", &deploy.mint_limit)
             .set("decimals", deploy.decimals.clone())
             .set("deployment", deploy.id.clone());
     });
