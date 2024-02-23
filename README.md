@@ -44,9 +44,11 @@ The substream roughly follows the following procedure to extract and interpret B
 ### Limitations
 Since the substream is not keeping track of ordinals nor the amount of sats held by each UTXO, this creates certain limitations. For instance, it is not possible to know the exact ordinal that has been inscribed with a BRC-20 operation. Moreover, in the case of transfer execution (i.e.: transfering the sat that has been inscribed with a `transfer` inscription), only transfers for which the inscribed sat is located in the first input UTXO of a transaction can be reliably handled.
 
-For this first version of the substream, a lot of BRC-20 "rules" are not enforced by the substreams (e.g.: transfer of tokens that the account does not own). Moreover, there is some ambiguity in the BRC-20 protocol which the substreams handles naively such as the deployment of multiple tokens with the same symbol (the symbol is naively used as the primary key, and the substreams considers both tokens to be the "same"). Trying to handle these cases would lead to ambiguity since, for instance, `mint` and `transfer` operations use the token symbol as the token identifier, which makes it essentially impossible to know *which* token is being referred to in the case where multiple tokens with the same symbol exist.
+For this first version of the substream, a lot of BRC-20 indexing "rules" are not enforced by the substreams (e.g.: transfer of tokens that the account does not own). This is partly due to the limitations of substreams store modules, which prohibit reading from and writing to a store in the same substreams module. This functionality would be necessary, for instance, to validate `mint` operations as we need to verify that the token can still be minted (i.e.: `total_minted + mint_amount < total_supply`) **and** update the token's `total_minted` value in the same module.
 
 The list of indexing rules can be found [here](https://layer1.gitbook.io/layer1-foundation/protocols/brc-20/indexing).
+
+For a checklist of indexing rules covered by this subtreams, see [checklist.md](checklist.md). 
 
 ## License
 [Apache 2.0](LICENSE)
