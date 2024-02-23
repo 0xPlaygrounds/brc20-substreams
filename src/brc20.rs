@@ -11,10 +11,6 @@ where
     let value = Value::deserialize(deserializer)?;
     match value {
         Value::String(s) => BigInt::from_str(&s).map_err(serde::de::Error::custom),
-        Value::Number(n) => Ok(BigInt::from(
-            n.as_i64()
-                .ok_or(serde::de::Error::custom("Invalid number"))?,
-        )),
         _ => Err(serde::de::Error::custom("Invalid type")),
     }
 }
@@ -28,10 +24,6 @@ where
         Value::String(s) => BigInt::from_str(&s)
             .map(Some)
             .map_err(serde::de::Error::custom),
-        Value::Number(n) => Ok(Some(BigInt::from(
-            n.as_i64()
-                .ok_or(serde::de::Error::custom("Invalid number"))?,
-        ))),
         Value::Null => Ok(None),
         _ => Err(serde::de::Error::custom("Invalid type")),
     }
@@ -39,32 +31,87 @@ where
 
 #[derive(Debug, Deserialize)]
 pub struct Deploy {
-    pub tick: String,
+    pub p: String,
+    tick: String,
     #[serde(deserialize_with = "deserialize_bigint")]
     pub max: BigInt,
     #[serde(deserialize_with = "deserialize_bigint_option")]
-    pub lim: Option<BigInt>,
-    pub dec: Option<i32>,
+    lim: Option<BigInt>,
+    dec: Option<i32>,
 }
 
 impl Deploy {
     pub fn dec(&self) -> i32 {
         self.dec.unwrap_or(18)
     }
+
+    pub fn lim(&self) -> BigInt {
+        self.lim.as_ref().unwrap_or(&self.max).clone()
+    }
+
+    pub fn tick(&self) -> String {
+        self.tick.to_lowercase()
+    }
+
+    pub fn valid(&self) -> bool {
+        // Check zero values
+        if self.max.is_zero() || self.lim().is_zero() {
+            return false;
+        }
+
+        // Check dec value
+        if self.dec() > 18 || self.dec() < 0 {
+            return false;
+        }
+
+        true
+    }
 }
 
 #[derive(Debug, Deserialize)]
 pub struct Mint {
-    pub tick: String,
+    pub p: String,
+    tick: String,
     #[serde(deserialize_with = "deserialize_bigint")]
     pub amt: BigInt,
 }
 
+impl Mint {
+    pub fn tick(&self) -> String {
+        self.tick.to_lowercase()
+    }
+
+    pub fn valid(&self) -> bool {
+        // Check zero values
+        if self.amt.is_zero() {
+            return false;
+        }
+
+        true
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct Transfer {
-    pub tick: String,
+    pub p: String,
+    tick: String,
     #[serde(deserialize_with = "deserialize_bigint")]
     pub amt: BigInt,
+}
+
+impl Transfer {
+    pub fn tick(&self) -> String {
+        self.tick.to_lowercase()
+    }
+
+    pub fn valid(&self) -> bool {
+        // Check zero values
+        if self.amt.is_zero() {
+            return false;
+        }
+
+        true
+    }
 }
 
 #[derive(Debug, Deserialize)]
@@ -73,4 +120,40 @@ pub enum Brc20Event {
     Deploy(Deploy),
     Mint(Mint),
     Transfer(Transfer),
+}
+
+impl Brc20Event {
+    pub fn p(&self) -> &str {
+        match self {
+            Brc20Event::Deploy(d) => &d.p,
+            Brc20Event::Mint(m) => &m.p,
+            Brc20Event::Transfer(t) => &t.p,
+        }
+    }
+
+    pub fn tick(&self) -> String {
+        match self {
+            Brc20Event::Deploy(d) => d.tick(),
+            Brc20Event::Mint(m) => m.tick(),
+            Brc20Event::Transfer(t) => t.tick(),
+        }
+    }
+
+    pub fn valid(&self) -> bool {
+        // Check protocol
+        if self.p() != "brc-20" {
+            return false;
+        }
+
+        // Check ticker
+        if self.tick().len() != 4 {
+            return false;
+        }
+
+        match self {
+            Brc20Event::Deploy(d) => d.valid(),
+            Brc20Event::Mint(m) => m.valid(),
+            Brc20Event::Transfer(t) => t.valid(),
+        }
+    }
 }
