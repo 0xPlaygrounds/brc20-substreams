@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  name: brc20-susbtreams
+  name: brc20_substreams
   version: v0.1.1
   image: assets/logo.png
 
