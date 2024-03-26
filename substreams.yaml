@@ -21,14 +21,6 @@ binaries:
     file: ./target/wasm32-unknown-unknown/release/substreams.wasm
 
 modules:
-  - name: map_inscriptions
-    kind: map
-    initialBlock: 779830
-    inputs:
-      - source: sf.bitcoin.type.v1.Block
-    output:
-      type: proto:ordinals.v1.Inscriptions
-
   - name: map_brc20_events
     kind: map
     initialBlock: 779830
